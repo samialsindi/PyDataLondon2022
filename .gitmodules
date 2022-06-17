@@ -7,3 +7,6 @@
 [submodule "Friday_TS2_1330"]
 	path = Friday_TS2_1330
 	url = https://github.com/rrpelgrim/dask-mini-tutorial.git
+[submodule "Friday_TS1_1530"]
+	path = Friday_TS1_1530
+	url = https://github.com/DataGasmic/PyData-London-2022-Tutorial-Stacking-Neural-Nets-Together.git
