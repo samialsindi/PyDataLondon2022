@@ -4,3 +4,6 @@
 [submodule "Friday_TS2_1100"]
 	path = Friday_TS2_1100
 	url = https://github.com/anovos/anovos
+[submodule "Friday_TS2_1330"]
+	path = Friday_TS2_1330
+	url = https://github.com/rrpelgrim/dask-mini-tutorial.git
