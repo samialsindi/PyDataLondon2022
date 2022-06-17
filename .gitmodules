@@ -1,0 +1,6 @@
+[submodule "Friday_TS2_0900"]
+	path = Friday_TS2_0900
+	url = https://github.com/NatanMish/data_validation
+[submodule "Friday_TS2_1100"]
+	path = Friday_TS2_1100
+	url = https://github.com/anovos/anovos

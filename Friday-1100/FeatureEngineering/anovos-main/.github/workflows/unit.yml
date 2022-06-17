@@ -1,0 +1,89 @@
+name: Unit Test
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    paths:
+      - '.github/workflows/unit.yml'
+    branches-ignore:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - python: '3.7'
+            spark: '2.4.8'
+            hadoop: '2.7'
+            java: '8'
+            experimental: false
+          - python: '3.9'
+            spark: '3.1.3'
+            hadoop: '3.2'
+            java: '11'
+            experimental: false
+          - python: '3.10'
+            spark: '3.2.1'
+            hadoop: '3.2'
+            java: '11'
+            experimental: false
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.java }}
+
+      - uses: vemonet/setup-spark@v1
+        with:
+          spark-version: ${{ matrix.spark }}
+          hadoop-version: ${{ matrix.hadoop }}
+
+      - name: Checkout code
+        uses: actions/checkout@master
+
+      - name: Load PIP cache
+        uses: actions/cache@v3.0.4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python}}-${{ hashFiles('./requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python}}-
+            ${{ runner.os }}-pip-
+
+      - name: Install Python requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov wheel
+          pip install -r requirements.txt
+
+      - name: Check SPARK_HOME
+        run: |
+          echo $SPARK_HOME
+          ls $SPARK_HOME
+
+      - name: Load sentence_transformer cache
+        uses: actions/cache@v3.0.4
+        with:
+          path: ~/.cache/sentence-transformers_all-mpnet-base-v2
+          key: ${{ runner.os }}-sentence_transformers-${{ matrix.python}}-${{ hashFiles('./requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-sentence_transformers-${{ matrix.python}}-
+            ${{ runner.os }}-sentence_transformers-
+
+      - name: Set SENTENCE_TRANSFORMERS_HOME
+        run: |
+          export SENTENCE_TRANSFORMERS_HOME="~/.cache"
+
+      - name: Run all unit tests with coverage
+        run: |
+          pytest -v --cov=src/main/anovos src/test/anovos
